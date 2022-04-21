@@ -1,0 +1,76 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+<br />
+<br />
+<form>
+    <input type="file" name="pdfFile" id="FileUpload1" value="Browse" accept="application/pdf" />
+</form>
+<br />
+<br />
+
+<input type="button" name="Validate" id="Validate" value="Validate" />
+<br />
+<br />
+<div id="OutputDisplay" style="display:none;">
+    <p> Policy No.: <span id="policyNo"></span></p>
+    <p> Telephone No.: <span id="telephone"></span></p>
+    <p> Email Id.: <span id="emailid"></span></p>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('input[type="file"]').change(function (e) {
+                var fileUpload = $("#FileUpload1").get(0);
+                var files = fileUpload.files;
+
+                var fileData = new FormData();
+
+                // Looping over all files and add it to FormData object
+                for (var i = 0; i < files.length; i++) {
+                    fileData.append(files[i].name, files[i]);
+                }
+
+                $.ajax({
+                    url: '/PdfReader/UploadFiles',
+                    type: "POST",
+                    contentType: false,
+                    processData: false,
+                    data: fileData,
+                    success: function (result) {
+                        alert(result.responseText);
+                    },
+                    error: function (err) {
+                        alert(err.statusText);
+                    }
+                });
+
+            });
+
+        });
+
+        $("#Validate").click(function () {
+            $.ajax({
+                url: '/PdfReader/Validate',
+                type: "GET",
+                contentType: false,
+                processData: false,
+                data: "",
+                success: function (result) {
+                    $('#OutputDisplay').show();
+                    $('#policyNo').text(result.responseData.Policy_no);
+                    $('#telephone').text(result.responseData.Telephone);
+                    $('#emailid').text(result.responseData.Email_id);
+                },
+                error: function (err) {
+                    alert(err.statusText);
+                }
+            });
+        });
+    </script>
+}
+
+
+
